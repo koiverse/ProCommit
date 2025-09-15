@@ -210,7 +210,7 @@
   },
   "devDependencies": {
     "@types/glob": "^8.1.0",
-    "@types/node": "22.x",
+    "@types/node": "24.x",
     "@types/vscode": "^1.76.0",
     "@typescript-eslint/eslint-plugin": "^5.56.0",
     "@typescript-eslint/parser": "^5.62.0",
