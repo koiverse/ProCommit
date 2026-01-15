@@ -2,7 +2,7 @@
   "name": "pro-commit",
   "displayName": "ProCommit",
   "description": "📝 A Customizable VS Code extension for AI-generated commit messages.",
-  "version": "2.0.9",
+  "version": "2.1.0",
   "homepage": "https://prplmoe.me",
   "bugs": "https://github.com/koiverse/ProCommit/issues",
   "repository": {
@@ -83,6 +83,11 @@
       {
         "command": "procommit.setMessageApproveMethod",
         "title": "Set Message Approve Method",
+        "category": "ProCommit"
+      },
+      {
+        "command": "procommit.setIncludeFileExtension",
+        "title": "Set Include File Extension in Scope",
         "category": "ProCommit"
       },
       {
@@ -180,6 +185,11 @@
           "default": "Quick pick",
           "description": "Method used to approve generated commit messages"
         },
+        "procommit.general.includeFileExtension": {
+          "type": "boolean",
+          "default": true,
+          "description": "Include file extension in generated commit scope (e.g., 'app.js' vs 'app')."
+        },
         "procommit.general.useMultipleResults": {
           "type": "boolean",
           "default": false,
@@ -215,7 +225,7 @@
     "@typescript-eslint/eslint-plugin": "^5.56.0",
     "@typescript-eslint/parser": "^5.62.0",
     "@vscode/test-electron": "^2.4.1",
-    "@vscode/vsce": "^3.3.2",
+    "@vscode/vsce": "^3.6.2",
     "esbuild": "^0.24.2",
     "eslint": "^8.36.0",
     "glob": "^11.0.0",

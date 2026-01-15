@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 
-import { generateAiCommitCommand, setOpenaiApiKey, setGenerator, setLanguage, setMessageApproveMethod, setModelVersion, setCustomEndpoint, setTemperature, setMaxTokens } from "@commands";
+import { generateAiCommitCommand, setOpenaiApiKey, setGenerator, setLanguage, setMessageApproveMethod, setModelVersion, setCustomEndpoint, setTemperature, setMaxTokens, setIncludeFileExtension } from "@commands";
 
 export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
@@ -55,6 +55,12 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand(
       "procommit.setMaxTokens",
       setMaxTokens
+    )
+  );
+  context.subscriptions.push(
+    vscode.commands.registerCommand(
+      "procommit.setIncludeFileExtension",
+      setIncludeFileExtension
     )
   );
 }
