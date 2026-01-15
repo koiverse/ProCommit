@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## 2.1.0 - 2026-01-16
+
+### Added
+- feat: Add `procommit.general.includeFileExtension` setting to control inclusion of file extensions in commit scopes
+
+### Changed
+- refactor: Update ChatGPT commit message generator to respect `includeFileExtension` setting when formatting scopes
+
+### Fixed
+- fix: Ensure scope formatting correctly handles file extensions based on user configuration
+- fix: ProCommit not detected git submodules
+
 
 ## 2.0.9 - 2025-09-01
 

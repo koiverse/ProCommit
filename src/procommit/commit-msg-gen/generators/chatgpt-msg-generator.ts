@@ -93,6 +93,15 @@ export class ChatgptMsgGenerator implements MsgGenerator {
         let [_, type, scope, subject] = match;
         type = type.toLowerCase();
         scope = scope.trim().split("/").pop() || scope.trim();
+        try {
+          const includeExt = config.general?.includeFileExtension ?? true;
+          if (!includeExt) {
+            const dotIndex = scope.lastIndexOf('.');
+            if (dotIndex > 0) {
+              scope = scope.substring(0, dotIndex);
+            }
+          }
+        } catch (e) {}
         subject = subject.trim().toLowerCase();
         scope = scope.replace(/^\/*|\/*$/g, "");
         subject = subject.replace(/^`+|`+$/g, "");
