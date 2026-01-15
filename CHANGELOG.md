@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2.1.1 - 2026-01-16
+
+## Fixed
+- fix: issue on [#69](https://github.com/koiverse/ProCommit/issues/69)
+- fix: missing included file extension feature
+
 ## 2.1.0 - 2026-01-16
 
 ### Added
