@@ -86,6 +86,11 @@
         "category": "ProCommit"
       },
       {
+        "command": "procommit.setIncludeFileExtension",
+        "title": "Set Include File Extension in Scope",
+        "category": "ProCommit"
+      },
+      {
         "command": "procommit.setModelVersion",
         "title": "Set Model Version",
         "category": "ProCommit"
@@ -179,6 +184,11 @@
           ],
           "default": "Quick pick",
           "description": "Method used to approve generated commit messages"
+        },
+        "procommit.general.includeFileExtension": {
+          "type": "boolean",
+          "default": true,
+          "description": "Include file extension in generated commit scope (e.g., 'app.js' vs 'app')."
         },
         "procommit.general.useMultipleResults": {
           "type": "boolean",

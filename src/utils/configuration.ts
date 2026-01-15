@@ -27,6 +27,7 @@ const configurationSchema = z.object({
       .optional(),
     useMultipleResults: z.boolean().default(false).catch(false).optional(),
     showEmoji: z.boolean().default(false).catch(false).optional(),
+    includeFileExtension: z.boolean().default(true).catch(true).optional(),
   }),
 });
 
