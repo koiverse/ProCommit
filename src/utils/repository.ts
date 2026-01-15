@@ -1,4 +1,5 @@
 import * as vscode from "vscode";
+import * as path from "path";
 
 import { GitExtension } from "@procommit/scm/types";
 
@@ -22,17 +23,21 @@ export async function getRepositoryFromGitExtension(
   // Try to find repository for active editor
   const activeEditor = vscode.window.activeTextEditor;
   if (activeEditor) {
-    const folder = vscode.workspace.getWorkspaceFolder(activeEditor.document.uri);
-    if (folder) {
-      const found = repositories.find((r) => {
-        try {
-          const root = r.rootUri?.fsPath ?? r.rootUri?.path;
-          return root === folder.uri.fsPath || root === folder.uri.path;
-        } catch (e) {
-          return false;
-        }
+    const activeFilePath = activeEditor.document.uri.fsPath;
+    const candidates = repositories.filter((r) => {
+      const rootPath = r.rootUri?.fsPath ?? r.rootUri?.path;
+      if (!rootPath) return false;
+      return activeFilePath.startsWith(rootPath + path.sep) || activeFilePath === rootPath;
+    });
+    if (candidates.length === 1) {
+      return candidates[0];
+    } else if (candidates.length > 1) {
+      candidates.sort((a, b) => {
+        const aRoot = (a.rootUri?.fsPath ?? a.rootUri?.path ?? '').length;
+        const bRoot = (b.rootUri?.fsPath ?? b.rootUri?.path ?? '').length;
+        return bRoot - aRoot;
       });
-      if (found) return found;
+      return candidates[0];
     }
   }
 

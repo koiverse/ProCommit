@@ -7,3 +7,4 @@ export * from "./set-model-version";
 export * from "./set-custom-endpoint";
 export * from "./set-temperature";
 export * from "./set-max-tokens";
+export * from "./set-include-file-extension";
