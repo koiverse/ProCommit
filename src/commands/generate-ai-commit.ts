@@ -4,11 +4,11 @@ import { tmpdir } from "os";
 import * as path from "path";
 
 import { getConfiguration } from "@utils/configuration";
+import { getRepositoryFromGitExtension } from "@utils/repository";
 import { GitExtension } from "@procommit/scm/types";
 import { GitCommitMessageWriter, VscodeGitDiffProvider } from "@procommit/scm";
 import { GenerateCompletionFlow } from "@flows";
-// Removed duplicate import
-import { ChatgptMsgGenerator, GeminiMsgGenerator } from "@procommit/commit-msg-gen";
+import { ChatgptMsgGenerator } from "@procommit/commit-msg-gen";
 import { runTaskWithTimeout } from "@utils/timer";
 import { logToOutputChannel } from "@utils/output";
 import { isValidApiKey } from "@utils/text";
@@ -103,7 +103,8 @@ export async function generateAiCommitCommand() {
 
     const configuration = getConfiguration();
 
-  const commitMessageWriter = await GitCommitMessageWriter.fromGitExtension(gitExtension);
+    const repository = await getRepositoryFromGitExtension(gitExtension);
+    const commitMessageWriter = new GitCommitMessageWriter(repository);
     let messageGenerator;
     const apiKey = configuration.apiKey || "";
     const endpoint = configuration.endpoint || "";
@@ -139,7 +140,7 @@ export async function generateAiCommitCommand() {
         break;
       }
     }
-  const diffProvider = await VscodeGitDiffProvider.fromGitExtension(gitExtension);
+    const diffProvider = new VscodeGitDiffProvider(repository);
 
     const generateCompletionFlow = new GenerateCompletionFlow(
       messageGenerator,

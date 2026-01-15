@@ -6,7 +6,7 @@ export async function setModelVersion() {
   logToOutputChannel("Starting setModelVersion command");
   const modelVersion = await vscode.window.showInputBox({
     title: "Enter the model version for AI commit messages",
-    value: "gpt-3.5-turbo-16k",
+    value: "gpt-4o-mini",
   });
 
   if (!modelVersion) {
@@ -15,7 +15,7 @@ export async function setModelVersion() {
   }
 
   logToOutputChannel("Saving model version configuration");
-  await setConfigurationValue("openAI.modelVersion", modelVersion);
+  await setConfigurationValue("model", modelVersion);
 
   return modelVersion;
 }

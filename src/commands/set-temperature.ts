@@ -1,4 +1,3 @@
-
 import * as vscode from "vscode";
 import { setConfigurationValue } from "@utils/configuration";
 import { logToOutputChannel } from "@utils/output";
@@ -20,7 +19,7 @@ export async function setTemperature() {
   }
 
   logToOutputChannel("Saving temperature configuration");
-  await setConfigurationValue("openAI.temperature", parseFloat(temperature));
+  await setConfigurationValue("temperature", parseFloat(temperature));
 
   return temperature;
 }

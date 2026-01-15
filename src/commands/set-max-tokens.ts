@@ -19,7 +19,7 @@ export async function setMaxTokens() {
   }
 
   logToOutputChannel("Saving max tokens configuration");
-  await setConfigurationValue("openAI.maxTokens", parseInt(maxTokens, 10));
+  await setConfigurationValue("maxTokens", parseInt(maxTokens, 10));
 
   return maxTokens;
 }
