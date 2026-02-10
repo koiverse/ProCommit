@@ -1,5 +1,5 @@
 import { MsgGenerator, createDiffAwareUserPrompt, postProcessCommitMessage } from "./msg-generator";
-import { OpenAIApi, Configuration as OpenAIConfiguration, ChatCompletionRequestMessage, ChatCompletionRequestMessageRoleEnum } from "openai";
+import fetch from "node-fetch";
 import { getConfiguration } from "@utils/configuration";
 import {
   englishInstructions,
@@ -18,8 +18,7 @@ export class ChatgptMsgGenerator implements MsgGenerator {
   async generate(diff: string): Promise<string | string[]> {
     const config = getConfiguration();
     const apiKey = config.apiKey || "";
-    const customEndpoint = config.endpoint?.trim() || undefined;
-    // Model, temperature, maxTokens are not in config schema, so use defaults
+    const endpoint = (config.endpoint?.trim() || "https://api.openai.com/v1").replace(/\/+$/, "");
     const model = config.model || "gpt-4o-mini";
     const temperature = config.temperature || 0.2;
     const maxTokens = config.maxTokens || 196;
@@ -52,46 +51,46 @@ export class ChatgptMsgGenerator implements MsgGenerator {
         break;
     }
 
-    const messages: ChatCompletionRequestMessage[] = [
-      {
-        role: ChatCompletionRequestMessageRoleEnum.System,
-        content: instruction,
-      },
-      {
-        role: ChatCompletionRequestMessageRoleEnum.User,
-        content: diff,
-      },
-      {
-        role: ChatCompletionRequestMessageRoleEnum.Assistant,
-        content: assistantMessage,
-      },
-    ];
-
     const includeFileExtension = config.general?.includeFileExtension ?? true;
     const { userPrompt, analysis } = createDiffAwareUserPrompt(diff);
-    messages[1] = {
-      role: ChatCompletionRequestMessageRoleEnum.User,
-      content: userPrompt,
-    };
+    const messages = [
+      { role: "system", content: instruction },
+      { role: "user", content: userPrompt },
+      { role: "assistant", content: assistantMessage },
+    ] as const;
 
-    const openai = new OpenAIApi(
-      new OpenAIConfiguration({ apiKey }),
-      customEndpoint
-    );
-    const { data } = await openai.createChatCompletion({
-      model,
-      messages,
-      n,
-      temperature,
-      max_tokens: maxTokens,
+    if (!apiKey || apiKey.trim() === "") {
+      throw new Error("API Key is required for ChatGPT generator.");
+    }
+
+    const response = await fetch(`${endpoint}/chat/completions`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model,
+        messages,
+        n,
+        temperature,
+        max_tokens: maxTokens,
+      }),
     });
+
+    if (!response.ok) {
+      const errorText = await safeReadText(response);
+      throw new Error(`OpenAI API error: ${response.status} ${response.statusText}${errorText ? ` - ${errorText}` : ""}`);
+    }
+
+    const data: any = await response.json();
 
     if (!data || !data.choices || data.choices.length === 0) {
       throw new Error("No commit messages were generated. Try again.");
     }
 
-    const commitMessages = data.choices.map((choice) =>
-      postProcessCommitMessage(choice.message?.content ?? "", {
+    const commitMessages = (data.choices as any[]).map((choice) =>
+      postProcessCommitMessage(choice?.message?.content ?? "", {
         includeFileExtension,
         analysis,
       })
@@ -102,5 +101,14 @@ export class ChatgptMsgGenerator implements MsgGenerator {
       return uniqueMessages;
     }
     return uniqueMessages[0] ?? "";
+  }
+}
+
+async function safeReadText(response: any): Promise<string> {
+  try {
+    const text = await response.text();
+    return typeof text === "string" ? text.trim() : "";
+  } catch {
+    return "";
   }
 }
