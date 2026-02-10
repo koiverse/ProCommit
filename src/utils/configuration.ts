@@ -33,6 +33,25 @@ const configurationSchema = z.object({
 
 export type Configuration = z.infer<typeof configurationSchema>;
 
+function readConfigurationSnapshot(): unknown {
+  const configuration = vscode.workspace.getConfiguration("procommit");
+  return {
+    apiKey: configuration.get("apiKey"),
+    endpoint: configuration.get("endpoint"),
+    model: configuration.get("model"),
+    temperature: configuration.get("temperature"),
+    maxTokens: configuration.get("maxTokens"),
+    general: {
+      generator: configuration.get("general.generator"),
+      messageApproveMethod: configuration.get("general.messageApproveMethod"),
+      language: configuration.get("general.language"),
+      useMultipleResults: configuration.get("general.useMultipleResults"),
+      showEmoji: configuration.get("general.showEmoji"),
+      includeFileExtension: configuration.get("general.includeFileExtension"),
+    },
+  };
+}
+
 export async function setConfigurationValue(
   key: DeepKey<Configuration>,
   value: any
@@ -42,18 +61,15 @@ export async function setConfigurationValue(
 }
 
 export function getLanguage(): string {
-  const configuration = vscode.workspace.getConfiguration("procommit");
-  const parsed = configurationSchema.parse(configuration);
+  const parsed = configurationSchema.parse(readConfigurationSnapshot());
   return parsed.general.language ?? "English";
 }
 
 export function getConfiguration() {
-  const configuration = vscode.workspace.getConfiguration("procommit");
-  return configurationSchema.parse(configuration);
+  return configurationSchema.parse(readConfigurationSnapshot());
 }
 
 export function getShowEmoji(): boolean {
-  const configuration = vscode.workspace.getConfiguration("procommit");
-  const parsed = configurationSchema.parse(configuration);
+  const parsed = configurationSchema.parse(readConfigurationSnapshot());
   return parsed.general.showEmoji ?? false;
 }
