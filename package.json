@@ -11,7 +11,7 @@
   },
   "license": "MIT",
   "engines": {
-    "vscode": "^1.109"
+    "vscode": "^1.109.0"
   },
   "publisher": "Kochan",
   "categories": [
