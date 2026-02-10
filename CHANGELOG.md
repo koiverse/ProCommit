@@ -1,5 +1,25 @@
 # CHANGELOG
 
+## 2.1.2 - 2026-02-10
+
+### What Changed
+
+- Added a diff-aware pre-analysis step that extracts per-file stats, rename/add/delete info, likely scope/type hints, and “technical anchors” (identifiers, config keys, dependency names), then feeds the model DIFF_SUMMARY + RAW_DIFF instead of raw diff alone: msg-generator.ts:L1-L214
+- Upgraded the base instructions so the subject is required to be concrete/technical (must mention at least one real artifact) and no longer forces everything to lowercase (keeps OAuth/HTTP/JSON casing, identifiers, etc.): langInstruction.ts
+- Unified output cleanup across all generators (ChatGPT/Gemini/Ollama/LMStudio/Smithery/Custom) using the same post-processor, and added a fallback when the model returns generic “classic” subjects: msg-generator.ts:L191-L229
+- Fixed Issue #70
+
+### Better “Results” Handling
+
+- Fixed multi-result selection so the chosen quick-pick result is actually written to the commit message file (previously selection didn’t affect output): generate-ai-commit.ts
+- Enabled true multi-result output for the ChatGPT generator when useMultipleResults is enabled (returns a de-duplicated array): chatgpt-msg-generator.ts
+- Updated the flow to accept string | string[] from generators and to write the selected message: generate-completion-flow.ts
+
+### Fixed
+
+- Removed the OpenAI SDK import entirely and switched the ChatGPT generator to call the OpenAI Chat Completions REST endpoint via node-fetch (same approach style as other generators).
+- This avoids SDK export mismatches and bundles cleanly with esbuild.
+
 ## 2.1.1 - 2026-01-16
 
 ## Fixed
