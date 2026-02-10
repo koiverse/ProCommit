@@ -220,12 +220,12 @@
   },
   "devDependencies": {
     "@types/glob": "^9.0.0",
-    "@types/node": "22.x",
-    "@types/vscode": "^1.108.1",
+    "@types/node": "25.x",
+    "@types/vscode": "^1.76.0",
     "@typescript-eslint/eslint-plugin": "^5.56.0",
     "@typescript-eslint/parser": "^5.62.0",
     "@vscode/test-electron": "^2.4.1",
-    "@vscode/vsce": "^3.6.2",
+    "@vscode/vsce": "^3.7.1",
     "esbuild": "^0.24.2",
     "eslint": "^8.36.0",
     "glob": "^11.0.0",
@@ -233,7 +233,7 @@
   },
   "dependencies": {
     "@google/genai": "^1.10.0",
-    "execa": "^9.5.2",
+    "execa": "^9.6.1",
     "node-fetch": "^3.3.2",
     "openai": "^3.3.0",
     "zod": "^3.24.1"
