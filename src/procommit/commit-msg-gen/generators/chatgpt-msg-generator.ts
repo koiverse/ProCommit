@@ -1,7 +1,6 @@
-import { MsgGenerator } from "./msg-generator";
+import { MsgGenerator, createDiffAwareUserPrompt, postProcessCommitMessage } from "./msg-generator";
 import { OpenAIApi, Configuration as OpenAIConfiguration, ChatCompletionRequestMessage, ChatCompletionRequestMessageRoleEnum } from "openai";
 import { getConfiguration } from "@utils/configuration";
-import { trimNewLines } from "@utils/text";
 import {
   englishInstructions,
   russianInstructions,
@@ -16,7 +15,7 @@ import {
 } from "@utils/langInstruction";
 
 export class ChatgptMsgGenerator implements MsgGenerator {
-  async generate(diff: string): Promise<string> {
+  async generate(diff: string): Promise<string | string[]> {
     const config = getConfiguration();
     const apiKey = config.apiKey || "";
     const customEndpoint = config.endpoint?.trim() || undefined;
@@ -68,6 +67,13 @@ export class ChatgptMsgGenerator implements MsgGenerator {
       },
     ];
 
+    const includeFileExtension = config.general?.includeFileExtension ?? true;
+    const { userPrompt, analysis } = createDiffAwareUserPrompt(diff);
+    messages[1] = {
+      role: ChatCompletionRequestMessageRoleEnum.User,
+      content: userPrompt,
+    };
+
     const openai = new OpenAIApi(
       new OpenAIConfiguration({ apiKey }),
       customEndpoint
@@ -84,32 +90,17 @@ export class ChatgptMsgGenerator implements MsgGenerator {
       throw new Error("No commit messages were generated. Try again.");
     }
 
-    // Robust post-processing: enforce format and lowercase, clean up scope
-    const commitMessages = data.choices.map((choice) => {
-      let message = choice.message?.content || "";
-      message = trimNewLines(message).replace(/^\*\s*/, "");
-      const match = message.match(/^(\w+)\(([^)]+)\):\s*(.+)$/);
-      if (match) {
-        let [_, type, scope, subject] = match;
-        type = type.toLowerCase();
-        scope = scope.trim().split("/").pop() || scope.trim();
-        try {
-          const includeExt = config.general?.includeFileExtension ?? true;
-          if (!includeExt) {
-            const dotIndex = scope.lastIndexOf('.');
-            if (dotIndex > 0) {
-              scope = scope.substring(0, dotIndex);
-            }
-          }
-        } catch (e) {}
-        subject = subject.trim().toLowerCase();
-        scope = scope.replace(/^\/*|\/*$/g, "");
-        subject = subject.replace(/^`+|`+$/g, "");
-        return `${type}(${scope}): ${subject}`;
-      } else {
-        return message.trim().toLowerCase();
-      }
-    });
-    return commitMessages[0];
+    const commitMessages = data.choices.map((choice) =>
+      postProcessCommitMessage(choice.message?.content ?? "", {
+        includeFileExtension,
+        analysis,
+      })
+    );
+
+    const uniqueMessages = [...new Set(commitMessages.map((m) => m.trim()).filter(Boolean))];
+    if (config.general.useMultipleResults) {
+      return uniqueMessages;
+    }
+    return uniqueMessages[0] ?? "";
   }
 }

@@ -92,16 +92,18 @@ export async function generateAiCommitCommand() {
       await gitExtension.activate();
     }
 
-    if (!isValidApiKey()) {
-      logToOutputChannel("OpenAI API Key is not set. Asking user to set it.");
+    const configuration = getConfiguration();
+    const generator = configuration.general.generator ?? "ChatGPT";
+    const apiKeyRequired = generator === "ChatGPT" || generator === "Gemini" || generator === "Smithery";
+
+    if (apiKeyRequired && !isValidApiKey()) {
+      logToOutputChannel("API Key is not set. Asking user to set it.");
       await vscode.commands.executeCommand("procommit.setOpenAIApiKey");
     }
 
-    if (!isValidApiKey()) {
-      throw new Error("You should set OpenAi API Key before using extension!");
+    if (apiKeyRequired && !isValidApiKey()) {
+      throw new Error("You should set an API Key before using the selected generator!");
     }
-
-    const configuration = getConfiguration();
 
     const repository = await getRepositoryFromGitExtension(gitExtension);
     const commitMessageWriter = new GitCommitMessageWriter(repository);
@@ -167,6 +169,7 @@ export async function generateAiCommitCommand() {
               return {
                 result: quickPickResults !== undefined,
                 edited: false,
+                selectedMessage: quickPickResults?.detail,
               };
             } else {
               const quickPickResult = await vscode.window.showQuickPick(
@@ -182,6 +185,7 @@ export async function generateAiCommitCommand() {
               return {
                 result: quickPickResult?.label === "Yes",
                 edited: false,
+                selectedMessage: quickPickResult?.label === "Yes" ? messages[0] : undefined,
               };
             }
           case "Message file":
@@ -191,6 +195,7 @@ export async function generateAiCommitCommand() {
             return {
               result: true,
               edited: false,
+              selectedMessage: messages[0],
             };
         }
       }

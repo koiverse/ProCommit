@@ -1,6 +1,6 @@
 
 
-import { MsgGenerator } from "./msg-generator";
+import { MsgGenerator, createDiffAwareUserPrompt, postProcessCommitMessage } from "./msg-generator";
 import { GoogleGenAI } from "@google/genai";
 import { getConfiguration } from "@utils/configuration";
 import {
@@ -26,6 +26,7 @@ export class GeminiMsgGenerator implements MsgGenerator {
     const ai = new GoogleGenAI({ apiKey: this.apiKey });
     const config = getConfiguration();
     const language = config.general?.language || "English";
+    const includeFileExtension = config.general?.includeFileExtension ?? true;
     let instruction: string;
     switch (language) {
       case "Russian":
@@ -45,7 +46,8 @@ export class GeminiMsgGenerator implements MsgGenerator {
         instruction = englishInstructions;
         break;
     }
-    const prompt = `${instruction}\n\n${diff}`;
+    const { userPrompt, analysis } = createDiffAwareUserPrompt(diff);
+    const prompt = `${instruction}\n\n${userPrompt}`;
     const response = await ai.models.generateContent({
       model: this.model,
       contents: prompt,
@@ -53,6 +55,6 @@ export class GeminiMsgGenerator implements MsgGenerator {
     if (!response || typeof response.text !== "string" || !response.text.trim()) {
       throw new Error("No valid commit message found in Gemini response.");
     }
-    return response.text.trim();
+    return postProcessCommitMessage(response.text, { includeFileExtension, analysis });
   }
 }
