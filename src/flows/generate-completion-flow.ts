@@ -13,9 +13,10 @@ export class GenerateCompletionFlow
     private readonly msgGenerator: MsgGenerator,
     private readonly diffProvider: DiffProvider,
     private readonly commitMessageWriter: CommitMessageWriter,
-    private readonly onSelectMessage: (message: string) => Promise<{
+    private readonly onSelectMessage: (message: string | string[]) => Promise<{
       result: boolean;
       edited: boolean;
+      selectedMessage?: string;
       editedMessage?: string;
     }>
   ) {}
@@ -35,11 +36,11 @@ export class GenerateCompletionFlow
 
     const commitMessage = await this.msgGenerator.generate(diff);
 
-    if (!commitMessage) {
+    if (!commitMessage || (Array.isArray(commitMessage) && commitMessage.length === 0)) {
       throw new Error("No commit message were generated. Try again.");
     }
 
-    const { result, edited, editedMessage } = await this.onSelectMessage(
+    const { result, edited, selectedMessage, editedMessage } = await this.onSelectMessage(
       commitMessage
     );
 
@@ -50,7 +51,8 @@ export class GenerateCompletionFlow
     if (edited && editedMessage != null && editedMessage.trim() !== "") {
       await this.commitMessageWriter.write(editedMessage);
     } else {
-      await this.commitMessageWriter.write(commitMessage);
+      const fallback = Array.isArray(commitMessage) ? commitMessage[0] : commitMessage;
+      await this.commitMessageWriter.write((selectedMessage ?? fallback).trim());
     }
   }
 }

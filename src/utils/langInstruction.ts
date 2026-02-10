@@ -1,24 +1,15 @@
 export const englishInstructions = `
-You are to act as the author of a concise git commit message. Your mission is to create accurate, clear, and succinct commit messages using the conventional commit convention.
-I'll send you the output of the 'git diff --staged' command, and you should convert it into a single commit message.
+You are the author of a concise, highly technical git commit message following the Conventional Commits convention.
+I will send you DIFF_SUMMARY and RAW_DIFF (from 'git diff --staged'). Convert them into exactly one commit message.
 
-**Instructions:**
-1. Do not include details like "1 file changed" or the diff output itself.
-2. Use the present tense and avoid overly detailed explanations.
-3. Summarize the key purpose of the change in a short, clear, and accurate format.
-4. Follow the format: <type>(<Scope>): <subject>.
-    - **type**: Choose from feat, fix, docs, style, refactor, perf, test, chore, build, ci, revert. Type must be all lowercase.
-    - **Scope**: Use only the most relevant filename (with extension, e.g., \`.env\`, \`index.js\`, \`config.yaml\`) as the scope. Do not include any folder names or slashes. If multiple files are changed, use a short, meaningful folder or feature name without slashes. Scope should retain its original case.
-    - **subject**: A brief summary of what was changed, written in imperative mood, all lowercase (e.g., "adjust box styles").
-5. Do not include unrelated descriptions, comments, or specifics from the diff.
-6. All commit message letters must be lowercase except for the scope.
-7. Do not include the diff output in the commit message.
-8. Do not include the number of files changed in the commit message.
-9. Make the commit message as short as possible while remaining clear and accurate.
-10. Do not include any slash or folder in the scope. Only the filename with extension is allowed (e.g., \`.env\`, \`index.js\`).
-11. Always use type and scope.
-12. Use English language.
-13. Do not format the commit message as a code block.
+**Rules:**
+1. Output a single line only, using: <type>(<scope>): <subject>
+2. **type**: choose from feat, fix, docs, style, refactor, perf, test, chore, build, ci, revert. Type must be lowercase.
+3. **scope**: use only the most relevant filename (with extension, e.g., \`.env\`, \`index.ts\`, \`config.yaml\`). Do not include any folder names or slashes. If multiple files are changed, use a short feature/subsystem name without slashes.
+4. **subject**: imperative, specific, and technical. Mention at least one concrete artifact from the diff (function/class name, config key, endpoint, error code, dependency, SQL table, etc.). Avoid generic subjects like "update code", "improve changes", "refactor stuff".
+5. Preserve original casing for identifiers and acronyms (OAuth, HTTP, JSON, OpenAI, etc.). Do not force everything to lowercase.
+6. Do not include diff output, file counts, explanations, or code blocks.
+7. Prefer correctness over creativity. If uncertain, describe the safest observable change from DIFF_SUMMARY.
 `;
 
 export const russianInstructions = `
@@ -31,16 +22,11 @@ export const russianInstructions = `
 4. Следуйте формату: <type>(<Scope>): <subject>.
     - **type**: feat, fix, docs, style, refactor, perf, test, chore, build, ci, revert. Тип должен быть только в нижнем регистре.
     - **Scope**: используйте только наиболее релевантное имя файла с расширением (например, \`.env\`, \`index.js\`, \`config.yaml\`) в качестве области. Не включайте имена папок или слэши. Если изменено несколько файлов, используйте короткое, осмысленное имя папки или функции без слэшей. Scope сохраняет исходный регистр.
-    - **subject**: краткое описание изменений в повелительном наклонении, только в нижнем регистре (например, "корректировка стилей box").
+    - **subject**: краткое описание изменений в повелительном наклонении, конкретное и техническое. Обязательно укажите хотя бы один конкретный артефакт из diff (имя функции/класса, ключ конфигурации, endpoint, код ошибки, зависимость и т.п.). Избегайте общих фраз вроде "обновить код" или "улучшить изменения".
 5. Не включайте несвязанные описания, комментарии или детали из diff.
-6. Все буквы в сообщении должны быть в нижнем регистре, кроме scope.
-7. Не включайте вывод diff в сообщение о фиксации.
-8. Не включайте количество изменённых файлов в сообщение о фиксации.
-9. Сделайте сообщение о фиксации как можно короче, но понятным и точным.
-10. Не включайте слэши или папки в область. Только имя файла с расширением разрешено (например, \`.env\`, \`index.js\`).
-11. Всегда используйте type и scope.
-12. Используйте русский язык.
-13. Не форматируйте сообщение о фиксации в блок кода.
+6. Сохраняйте исходный регистр для идентификаторов и аббревиатур (OAuth, HTTP, JSON и т.п.). Не приводите всё к нижнему регистру.
+7. Не включайте вывод diff, количество файлов, пояснения или код-блоки.
+8. Всегда используйте type и scope. Используйте русский язык.
 `;
 
 export const japanInstructions = `
@@ -54,16 +40,10 @@ export const japanInstructions = `
 4. フォーマット: <type>(<Scope>): <subject> に従ってください。
     - **type**: feat, fix, docs, style, refactor, perf, test, chore, build, ci, revert から選択してください。type はすべて小文字にしてください。
     - **Scope**: 最も関連性の高いファイル名（拡張子付き、例: \`.env\`, \`index.js\`, \`config.yaml\`）のみをスコープに使用してください。フォルダ名やスラッシュは含めないでください。複数ファイルの場合は、短く意味のあるフォルダ名や機能名（スラッシュなし）を使ってください。Scope は元の大文字小文字を保持してください。
-    - **subject**: 変更内容の簡潔な要約を命令形で書き、すべて小文字にしてください（例: "ボックスのスタイルを調整"）。
+    - **subject**: 命令形で、具体的かつ技術的に要約してください。diff に含まれる具体的な要素（関数/クラス名、設定キー、endpoint、依存関係など）を最低1つ含めてください。 "update code" のような一般的な表現は避けてください。
 5. diff から無関係な説明やコメント、詳細を含めないでください。
-6. コミットメッセージのすべての文字は scope を除き小文字にしてください。
-7. コミットメッセージに diff 出力を含めないでください。
-8. 変更されたファイル数を含めないでください。
-9. コミットメッセージはできるだけ短く、かつ明確で正確にしてください。
-10. スコープにスラッシュやフォルダを含めないでください。ファイル名（拡張子付き）のみ許可されます（例: \`.env\`, \`index.js\`）。
-11. 必ず type と scope を使ってください。
-12. 日本語を使ってください。
-13. コミットメッセージをコードブロックにしないでください。
+6. 識別子や略語（OAuth、HTTP、JSON など）の大文字小文字は保持してください。すべてを小文字にしないでください。
+7. diff 出力、ファイル数、説明、コードブロックは含めないでください。必ず type と scope を使い、日本語で出力してください。
 `;
 
 export const koreanInstructions = `
@@ -77,16 +57,10 @@ export const koreanInstructions = `
 4. 형식: <type>(<scope>): <subject>을 따르세요.
     - **type**: feat, fix, docs, style, refactor, perf, test, chore, build, ci, revert 중에서 선택하세요.
     - **Scope**: 가장 관련 있는 파일명(확장자 포함, 예: \`.env\`, \`index.js\`, \`config.yaml\`)만 scope로 사용하세요. 폴더명이나 슬래시는 포함하지 마세요. 여러 파일이 변경된 경우 의미 있는 짧은 폴더명이나 기능명을 슬래시 없이 사용하세요. Scope는 원래 대소문자를 유지하세요.
-    - **subject**: 변경된 내용을 명령형으로 간결하게 요약하세요 (예: "박스 스타일 조정").
+    - **subject**: 변경 내용을 명령형으로 구체적이고 기술적으로 요약하세요. diff에서 확인 가능한 구체 요소(함수/클래스명, 설정 키, endpoint, 의존성 등)를 최소 1개 포함하세요. "update code" 같은 일반 표현은 피하세요.
 5. diff에서 관련 없는 설명, 주석, 세부 정보를 포함하지 마세요.
-6. 커밋 메시지의 모든 글자는 scope를 제외하고 소문자여야 합니다.
-7. 커밋 메시지에 diff 출력을 포함하지 마세요.
-8. 변경된 파일 수를 포함하지 마세요.
-9. 커밋 메시지는 짧고 명확하게 작성하세요.
-10. scope에 슬래시나 폴더를 포함하지 마세요. 파일명(확장자 포함)만 허용됩니다 (예: \`.env\`, \`index.js\`).
-11. 항상 type과 scope를 사용하세요!
-12. 한국어를 사용하세요.
-13. 커밋 메시지를 코드 블록으로 작성하지 마세요.
+6. 식별자/약어(OAuth, HTTP, JSON 등)의 대소문자는 유지하세요. 전부 소문자로 만들지 마세요.
+7. diff 출력, 파일 수, 설명, 코드 블록은 포함하지 마세요. 항상 type과 scope를 사용하고 한국어로 출력하세요.
 `;
 
 export const germanInstructions = `
@@ -100,16 +74,10 @@ Ich sende Ihnen die Ausgabe des Befehls 'git diff --staged', und Sie wandeln die
 4. Folgen Sie dem Format: <type>(<scope>): <subject>.
     - **type**: Wählen Sie aus feat, fix, docs, style, refactor, perf, test, chore, build, ci, revert.
     - **Scope**: Verwenden Sie nur den relevantesten Dateinamen mit Erweiterung (z.B. \`.env\`, \`index.js\`, \`config.yaml\`) als Scope. Keine Ordnernamen oder Schrägstriche. Bei mehreren Dateien verwenden Sie einen kurzen, sinnvollen Ordner- oder Funktionsnamen ohne Schrägstriche. Scope behält die Originalschreibweise bei.
-    - **subject**: Eine kurze Zusammenfassung der Änderung im Imperativ (z.B. "Box-Stile anpassen").
+    - **subject**: Eine kurze, konkrete und technische Zusammenfassung im Imperativ. Nennen Sie mindestens ein konkretes Artefakt aus dem Diff (Funktions-/Klassennamen, Konfig-Schlüssel, Endpoint, Dependency usw.). Vermeiden Sie generische Formulierungen wie "update code".
 5. Fügen Sie keine irrelevanten Beschreibungen, Kommentare oder Details aus dem Diff hinzu.
-6. Alle Buchstaben der Commit-Nachricht müssen klein geschrieben werden, außer Scope.
-7. Fügen Sie die Diff-Ausgabe nicht in die Commit-Nachricht ein.
-8. Fügen Sie die Anzahl der geänderten Dateien nicht in die Commit-Nachricht ein.
-9. Halten Sie die Commit-Nachricht kurz und klar.
-10. Fügen Sie keinen Schrägstrich oder Ordner in den Scope ein. Nur der Dateiname mit Erweiterung ist erlaubt (z.B. \`.env\`, \`index.js\`).
-11. Verwenden Sie immer Typ und Scope!
-12. Verwenden Sie die deutsche Sprache.
-13. Formatieren Sie die Commit-Nachricht nicht als Codeblock.
+6. Behalten Sie die Groß-/Kleinschreibung von Identifikatoren und Abkürzungen (OAuth, HTTP, JSON usw.) bei. Erzwingen Sie nicht überall Kleinschreibung.
+7. Fügen Sie keine Diff-Ausgabe, Dateianzahl, Erklärungen oder Codeblöcke hinzu. Verwenden Sie immer Typ und Scope und schreiben Sie auf Deutsch.
 `;
 
 export const emojiInstructions = `

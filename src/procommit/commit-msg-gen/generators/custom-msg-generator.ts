@@ -1,6 +1,6 @@
 
 import fetch from "node-fetch";
-import { MsgGenerator } from "./msg-generator";
+import { MsgGenerator, createDiffAwareUserPrompt, postProcessCommitMessage } from "./msg-generator";
 import { getConfiguration } from "@utils/configuration";
 import {
   englishInstructions,
@@ -20,6 +20,7 @@ export class CustomMsgGenerator implements MsgGenerator {
     const url = this.endpoint;
     const config = getConfiguration();
     const language = config.general?.language || "English";
+    const includeFileExtension = config.general?.includeFileExtension ?? true;
     let instruction: string;
     switch (language) {
       case "Russian":
@@ -39,7 +40,8 @@ export class CustomMsgGenerator implements MsgGenerator {
         instruction = englishInstructions;
         break;
     }
-    const prompt = `${instruction}\n\n${diff}`;
+    const { userPrompt, analysis } = createDiffAwareUserPrompt(diff);
+    const prompt = `${instruction}\n\n${userPrompt}`;
     const body = { diff: prompt };
     const response = await fetch(url, {
       method: "POST",
@@ -48,11 +50,10 @@ export class CustomMsgGenerator implements MsgGenerator {
     });
     if (!response.ok) throw new Error(`Custom generator API error: ${response.statusText}`);
     const data: any = await response.json();
-    // Try to extract a commit message from common fields
-    if (typeof data === "string") return data.trim();
-    if (data.commitMessage) return data.commitMessage.trim();
-    if (data.message) return data.message.trim();
-    if (data.output) return data.output.trim();
+    if (typeof data === "string") return postProcessCommitMessage(data, { includeFileExtension, analysis });
+    if (data.commitMessage) return postProcessCommitMessage(data.commitMessage, { includeFileExtension, analysis });
+    if (data.message) return postProcessCommitMessage(data.message, { includeFileExtension, analysis });
+    if (data.output) return postProcessCommitMessage(data.output, { includeFileExtension, analysis });
     throw new Error("No commit message returned by custom endpoint.");
   }
 }
